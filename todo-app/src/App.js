@@ -11,6 +11,8 @@ function App () {
   const [completedTodos, setCompletedTodos] = useState ([]);
   const [currentEdit,setCurrentEdit] = useState("");
   const [currentEditedItem,setCurrentEditedItem] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [timeoutId, setTimeoutId] = useState(null); // Track the timeout ID
 
   const handleAddTodo = () => {
     let newTodoItem = {
@@ -19,7 +21,23 @@ function App () {
     };
 
     let updatedTodoArr = [...allTodos];
-    updatedTodoArr.push (newTodoItem);
+    if (newTodoItem.title.trim() === '' || newTodoItem.description.trim() === '') {
+          
+      setErrorMessage('Title and description should not be empty.');
+            // Clear any existing timeout
+            if (timeoutId) clearTimeout(timeoutId);
+            // Set a new timeout to clear the error message after 1 second
+            const id = setTimeout(() => setErrorMessage(''), 1000);
+            setTimeoutId(id);
+      
+    }
+    else {
+      updatedTodoArr.push(newTodoItem);
+      setErrorMessage(''); // Clear error message
+    }
+    setNewTitle('');
+    setNewDescription('');
+
     setTodos (updatedTodoArr);
     localStorage.setItem ('todolist', JSON.stringify (updatedTodoArr));
   };
@@ -141,6 +159,7 @@ function App () {
               Add
             </button>
           </div>
+          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Display error message */}
         </div>
 
         <div className="btn-area">
